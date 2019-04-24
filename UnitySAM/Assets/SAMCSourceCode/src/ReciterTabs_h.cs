@@ -2,7 +2,7 @@
 public static partial class UnitySAM
 {
     //some flags
-    static int[] tab36376 = new int[]
+    readonly static int[] tab36376 = new int[]
     {
         0, 0, 0, 0, 0, 0, 0, 0, // 0-7
         0, 0, 0, 0, 0, 0, 0, 0, // 8-15
@@ -20,7 +20,7 @@ public static partial class UnitySAM
         163, 76, 138, 142
     };
 
-    static int[] rules = new int[]
+    readonly static int[] rules = new int[]
     {
         ']','A'|0x80,
         ' ','(','A','.',')',                    '=','E','H','4','Y','.',' '|0x80,
@@ -478,7 +478,7 @@ public static partial class UnitySAM
         'j'|0x80
     };
 
-    static int[] rules2 = new int[]
+    readonly static int[] rules2 = new int[]
     {
         '(','A',')',                            '='|0x80,
         '(','!',')',                            '=','.'|0x80,
@@ -526,7 +526,7 @@ public static partial class UnitySAM
 
     //26 items. From 'A' to 'Z'
     // positions for mem62 and mem63 for each character
-    static int[] tab37489 = new int[]
+    readonly static int[] tab37489 = new int[]
     {
         0, 149, 247, 162, 57, 197, 6, 126,
         199, 38, 55, 78, 145, 241, 85, 161,
@@ -534,7 +534,7 @@ public static partial class UnitySAM
         71, 218
     };
 
-    static int[] tab37515 = new int[]
+    readonly static int[] tab37515 = new int[]
     {
         125, 126, 126, 127, 128, 129, 130, 130,
         130, 132, 132, 132, 132, 132, 133, 135,

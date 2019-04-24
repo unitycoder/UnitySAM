@@ -3,13 +3,13 @@ public static partial class UnitySAM
 {
 
     //tab40672
-    static int[] stressInputTable = new int[]
+    readonly static int[] stressInputTable = new int[]
     {
     '*', '1', '2', '3', '4', '5', '6', '7', '8'
     };
 
     //tab40682
-    static int[] signInputTable1 = new int[]
+    readonly static int[] signInputTable1 = new int[]
     {
     ' ', '.', '?', ',', '-', 'I', 'I', 'E',
     'A', 'A', 'A', 'A', 'U', 'A', 'I', 'E',
@@ -25,7 +25,7 @@ public static partial class UnitySAM
     };
 
     //tab40763
-    static int[] signInputTable2 = new int[]
+    readonly static int[] signInputTable2 = new int[]
     {
     '*', '*', '*', '*', '*', 'Y', 'H', 'H',
     'E', 'A', 'H', 'O', 'H', 'X', 'X', 'R',
@@ -41,7 +41,7 @@ public static partial class UnitySAM
     };
 
     //loc_9F8C
-    static int[] flags = new int[]
+    readonly static int[] flags = new int[]
     {
     0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0xA4 , 0xA4 , 0xA4 ,
     0xA4 , 0xA4 , 0xA4 , 0x84 , 0x84 , 0xA4 , 0xA4 , 0x84 ,
@@ -58,7 +58,7 @@ public static partial class UnitySAM
 
     //??? flags overlap flags2
     //loc_9FDA
-    static int[] flags2 = new int[]
+    readonly static int[] flags2 = new int[]
     {
     0x80 , 0xC1 , 0xC1 , 0xC1 , 0xC1 , 0x00 , 0x00 , 0x00 ,
     0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 ,
@@ -75,7 +75,7 @@ public static partial class UnitySAM
 
 
     //tab45616???
-    static int[] phonemeStressedLengthTable = new int[]
+    readonly static int[] phonemeStressedLengthTable = new int[]
     {
     0x00 , 0x12 , 0x12 , 0x12 , 8 ,0xB , 9 ,0xB ,
     0xE ,0xF ,0xB , 0x10 ,0xC , 6 , 6 ,0xE ,
@@ -90,7 +90,7 @@ public static partial class UnitySAM
     };
 
     //tab45536???
-    static int[] phonemeLengthTable = new int[]
+    readonly static int[] phonemeLengthTable = new int[]
     {
     0 , 0x12 , 0x12 , 0x12 , 8 , 8 , 8 , 8 ,
     8 ,0xB , 6 ,0xC ,0xA , 5 , 5 ,0xB ,
