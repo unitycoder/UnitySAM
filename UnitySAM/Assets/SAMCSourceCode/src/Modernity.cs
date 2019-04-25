@@ -23,6 +23,8 @@ public static partial class UnitySAM
 
 		bool success = TextToPhonemes(ia);
 
+		Debug.Log( "success = " + success);
+
 		var what = ia;
 
 		what = inputtemp;

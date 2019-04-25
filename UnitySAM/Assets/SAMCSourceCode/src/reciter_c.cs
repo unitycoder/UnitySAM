@@ -19,7 +19,7 @@ public static partial class UnitySAM
     static void Code37066(int mem58)
     {
         X = mem58;
-        X++;
+        INC8( ref X);
         A = inputtemp[X];
         Y = A;
         A = tab36376[Y];
@@ -38,6 +38,18 @@ public static partial class UnitySAM
         return rules[address + Y];
     }
 
+	static void INC8( ref int xxx)
+	{
+		xxx++;
+		xxx &= 255;
+	}
+
+	static void DEC8( ref int xxx)
+	{
+		xxx--;
+		xxx &= 255;
+	}
+
     static bool TextToPhonemes( int[] input) // Code36484
     {
         //unsigned char *tab39445 = &mem[39445];   //input and output
@@ -48,6 +60,7 @@ public static partial class UnitySAM
         int mem59 = 0;
         int mem60 = 0;
         int mem61 = 0;
+
         int mem62 = 0;     // memory position of current rule
 
         int mem64 = 0;      // position of '=' or current character
@@ -71,8 +84,8 @@ public static partial class UnitySAM
             else if (A >= 96) A = A & 79;
 
             inputtemp[X] = A;
-            X++;
-            Y++;
+			INC8(ref X);
+			INC8(ref Y);
         } while (Y != 255);
 
 		printf( inputtemp);
@@ -90,7 +103,7 @@ public static partial class UnitySAM
     pos36554:
         while (true)
         {
-            mem61++;
+			INC8( ref mem61);
             X = mem61;
 
 			if (X >= inputtemp.Length) break;
@@ -99,7 +112,7 @@ public static partial class UnitySAM
             mem64 = A;
             if (A == '[')
             {
-                mem56++;
+				INC8(ref mem56);
                 X = mem56;
                 A = 155;
                 input[X] = 155;
@@ -110,11 +123,11 @@ public static partial class UnitySAM
 
             //pos36579:
             if (A != '.') break;
-            X++;
+			INC8(ref X);
             Y = inputtemp[X];
             A = tab36376[Y] & 1;
             if (A != 0) break;
-            mem56++;
+			INC8(ref mem56);
             X = mem56;
             A = '.';
             input[X] = '.';
@@ -140,7 +153,7 @@ public static partial class UnitySAM
 		if (X >= inputtemp.Length) return true;
 
         inputtemp[X] = ' ';
-        mem56++;
+		INC8(ref mem56);
         X = mem56;
         if (X > 120) goto pos36654;
         input[X] = A;
@@ -185,10 +198,10 @@ public static partial class UnitySAM
         Y = 0;
         do
         {
-            mem62 += 1;
+			mem62++;
             A = GetRuleByte(mem62, Y);
         } while ((A & 128) == 0);
-        Y++;
+        INC8( ref Y);
 
         //pos36720:
         // find '('
@@ -196,7 +209,7 @@ public static partial class UnitySAM
         {
             A = GetRuleByte(mem62, Y);
             if (A == '(') break;
-            Y++;
+			INC8( ref Y);
         }
         mem66 = Y;
 
@@ -204,7 +217,7 @@ public static partial class UnitySAM
         // find ')'
         do
         {
-            Y++;
+			INC8( ref Y);
             A = GetRuleByte(mem62, Y);
         } while (A != ')');
         mem65 = Y;
@@ -213,7 +226,7 @@ public static partial class UnitySAM
         // find '='
         do
         {
-            Y++;
+            INC8( ref Y);
             A = GetRuleByte(mem62, Y);
             A = A & 127;
         } while (A != '=');
@@ -224,16 +237,16 @@ public static partial class UnitySAM
 
         // compare the string within the bracket
         Y = mem66;
-        Y++;
+        INC8( ref Y);
         //pos36759:
         while (true)
         {
             mem57 = inputtemp[X];
             A = GetRuleByte(mem62, Y);
             if (A != mem57) goto pos36700;
-            Y++;
+            INC8( ref Y);
             if (Y == mem65) break;
-            X++;
+            INC8( ref X);
             mem60 = X;
         }
 
@@ -365,12 +378,12 @@ public static partial class UnitySAM
         X = mem58 + 1;
         A = inputtemp[X];
         if (A != 'E') goto pos37157;
-        X++;
+        INC8( ref X);
         Y = inputtemp[X];
         X--;
         A = tab36376[Y] & 128;
         if (A == 0) goto pos37108;
-        X++;
+        INC8( ref X);
         A = inputtemp[X];
         if (A != 'R') goto pos37113;
         pos37108:
@@ -380,27 +393,27 @@ public static partial class UnitySAM
     pos37113:
         if ((A == 83) || (A == 68)) goto pos37108;  // 'S' 'D'
         if (A != 76) goto pos37135; // 'L'
-        X++;
+        INC8( ref X);
         A = inputtemp[X];
         if (A != 89) goto pos36700;
         goto pos37108;
 
     pos37135:
         if (A != 70) goto pos36700;
-        X++;
+        INC8( ref X);
         A = inputtemp[X];
         if (A != 85) goto pos36700;
-        X++;
+        INC8( ref X);
         A = inputtemp[X];
         if (A == 76) goto pos37108;
         goto pos36700;
 
     pos37157:
         if (A != 73) goto pos36700;
-        X++;
+        INC8( ref X);
         A = inputtemp[X];
         if (A != 78) goto pos36700;
-        X++;
+        INC8( ref X);
         A = inputtemp[X];
         if (A == 71) goto pos37108;
         //pos37177:
@@ -487,7 +500,7 @@ public static partial class UnitySAM
         if (A != 0) goto pos37330;
         A = inputtemp[X];
         if (A != 72) goto pos36700;
-        X++;
+        INC8( ref X);
         A = inputtemp[X];
         if ((A == 67) || (A == 83)) goto pos37330;
         goto pos36700;
@@ -519,7 +532,7 @@ public static partial class UnitySAM
 
     pos37419:
         X = mem58;
-        X++;
+        INC8( ref X);
         A = inputtemp[X];
         if ((A == 69) || (A == 73) || (A == 89)) goto pos37414;
         goto pos36700;
@@ -547,7 +560,7 @@ public static partial class UnitySAM
         A = A & 127;
         if (A != '=')
         {
-            mem56++;
+			INC8( ref mem56);
             X = mem56;
             input[X] = A;
         }
@@ -557,7 +570,7 @@ public static partial class UnitySAM
         if ((mem57 & 128) == 0) goto pos37485; //???
         goto pos36554;
     pos37485:
-        Y++;
+        INC8( ref Y);
         goto pos37461;
     }
 }

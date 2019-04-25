@@ -7,6 +7,12 @@ public static partial class UnitySAM
 		Debug.Log("Print:'" + s + "'");
 	}
 
+	static void printf( int i)
+	{
+		int[] ia = new int[1] { i};
+		printf(ia);
+	}
+
 	static void printf(int[] ia)
 	{
 		byte[] bytes = new byte[ia.Length];
@@ -27,9 +33,25 @@ public static partial class UnitySAM
 		printf( s);
 	}
 
-	static void PrintRule(int i)
+	static void PrintRule(int offset)
 	{
-		Debug.Log("PrintRule:" + i.ToString());
+		int i = 1;
+		int A = 0;
+		string s = "Applying rule: ";
+		do
+		{
+			A = GetRuleByte(offset, i);
+			if ((A&127) == '=')
+			{
+				s = s + " -> ";
+			}
+			else
+			{
+				s = s + System.String.Format( "{0}", (char) (A & 127));
+			}
+			i++;
+		} while ((A&128)==0);
+		printf(s);
 	}
 
 	static void PrintPhonemes( int[] phonemeindex, int[] phonemeLength, int[] stress)
