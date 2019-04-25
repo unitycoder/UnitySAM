@@ -4,7 +4,7 @@ public static partial class UnitySAM
 {
     static int A, X, Y;
     
-    static int[] inputtemp = new int[256];   // secure copy of input tab36096
+    static int[] inputtemp;   // secure copy of input tab36096
 
     static void Code37055(int mem59)
     {
@@ -55,6 +55,8 @@ public static partial class UnitySAM
         int mem66 = 0;     // position of '('
         int mem36653 = 0;
 
+		inputtemp = new int[256];
+
         inputtemp[0] = 32;
 
         // secure copy of input
@@ -89,6 +91,9 @@ public static partial class UnitySAM
         {
             mem61++;
             X = mem61;
+
+			if (X >= inputtemp.Length) break;
+
             A = inputtemp[X];
             mem64 = A;
             if (A == '[')
@@ -130,6 +135,9 @@ public static partial class UnitySAM
         A = mem57;
         if (A != 0) goto pos36677;
         A = 32;
+
+		if (X >= inputtemp.Length) return 0;
+
         inputtemp[X] = ' ';
         mem56++;
         X = mem56;
