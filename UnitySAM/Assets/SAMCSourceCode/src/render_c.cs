@@ -323,7 +323,7 @@ public static partial class UnitySAM
 
 
 	//void Code47574()
-	static void Render()
+	public static void Render()
 	{
 		buf = new Buffer();
 

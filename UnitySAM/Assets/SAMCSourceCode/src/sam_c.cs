@@ -36,7 +36,7 @@ public static partial class UnitySAM
 	static int bufferpos=0;
 //	static int[] buffer;
 
-	static void SetInput(int[] _input)
+	public static void SetInput(int[] _input)
 	{
 		int l = _input.Length;
 	    if (l > 254) l = 254;
@@ -115,7 +115,7 @@ public static partial class UnitySAM
 
 
 	//int Code39771()
-	static int SAMMain()
+	public static int SAMMain()
 	{
 	    Init();
 	    phonemeindex[255] = 32; //to prevent buffer overflow
@@ -138,7 +138,7 @@ public static partial class UnitySAM
 	            phonemeindex[X] = 255;
 	            break; // error: delete all behind it
 	        }
-	        X++;
+			INC8( ref X);
 	    } while (X != 0);
 
 	    //pos39848:

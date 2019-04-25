@@ -2,7 +2,7 @@
 
 public static partial class UnitySAM
 {
-	static int[] IntArray(string s)
+	public static int[] IntArray(string s)
 	{
 		s = s.ToUpper();
 

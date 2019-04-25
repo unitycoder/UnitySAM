@@ -46,8 +46,13 @@ public class Test1 : MonoBehaviour
 			output = UnitySAM.TextToPhonemes(s);
 		}
 
-		Out(s);
+		Out("Input:" + s);
 
-		Out(output);
+		Out("Phonemes:" + output);
+
+		var ia = UnitySAM.IntArray( s);
+		UnitySAM.SetInput(ia);
+
+		UnitySAM.SAMMain();
 	}
 }
