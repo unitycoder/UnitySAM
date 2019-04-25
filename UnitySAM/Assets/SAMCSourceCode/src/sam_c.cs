@@ -3,39 +3,39 @@ public static partial class UnitySAM
 {
 	static bool debug;
 
-	int[] input = new int[256]; //tab39445
+	static int[] input = new int[256]; //tab39445
 
 	//standard sam sound
-	int speed = 72;
-	int pitch = 64;
-	int mouth = 128;
-	int throat = 128;
-	int singmode = 0;
+	static int speed = 72;
+	static int pitch = 64;
+	static int mouth = 128;
+	static int throat = 128;
+	static int singmode = 0;
 
-	int mem39;
-	int mem44;
-	int mem47;
-	int mem49;
-	int mem50;
-	int mem51;
-	int mem53;
-	int mem56;
+	static int mem39;
+	static int mem44;
+	static int mem47;
+	static int mem49;
+	static int mem50;
+	static int mem51;
+	static int mem53;
+	static int mem56;
 
-	int mem59=0;
+	static int mem59=0;
 
-	int[] stress = new int[256]; //numbers from 0 to 8
-	int[] phonemeLength = new int[256]; //tab40160
-	int[] phonemeindex = new int[256];
+	static int[] stress = new int[256]; //numbers from 0 to 8
+	static int[] phonemeLength = new int[256]; //tab40160
+	static int[] phonemeindex = new int[256];
 
-	int[] phonemeIndexOutput = new int[60]; //tab47296
-	int[] stressOutput = new int[60]; //tab47365
-	int[] phonemeLengthOutput = new int[60]; //tab47416
+	static int[] phonemeIndexOutput = new int[60]; //tab47296
+	static int[] stressOutput = new int[60]; //tab47365
+	static int[] phonemeLengthOutput = new int[60]; //tab47416
 
 // contains the final soundbuffer
-	int bufferpos=0;
-	int[] buffer;
+	static int bufferpos=0;
+	static int[] buffer;
 
-	void SetInput(int[] _input)
+	static void SetInput(int[] _input)
 	{
 	    int l = strlen(_input);
 	    if (l > 254) l = 254;
@@ -46,11 +46,11 @@ public static partial class UnitySAM
 	    input[l] = 0;
 	}
 
-	void SetSpeed(int _speed) {speed = _speed;}
-	void SetPitch(int _pitch) {pitch = _pitch;}
-	void SetMouth(int _mouth) {mouth = _mouth;}
-	void SetThroat(int _throat) {throat = _throat;}
-	void EnableSingmode() {singmode = 1;}
+	static void SetSpeed(int _speed) {speed = _speed;}
+	static void SetPitch(int _pitch) {pitch = _pitch;}
+	static void SetMouth(int _mouth) {mouth = _mouth;}
+	static void SetThroat(int _throat) {throat = _throat;}
+	static void EnableSingmode() {singmode = 1;}
 
 	//	char* GetBuffer(){return buffer;}
 	//	int GetBufferLength(){return bufferpos;}
@@ -64,7 +64,7 @@ public static partial class UnitySAM
 	// 174=amplitude3
 
 
-	void Init()
+	static void Init()
 	{
 	    SetMouthThroat( mouth, throat);
 
@@ -113,7 +113,7 @@ public static partial class UnitySAM
 
 
 	//int Code39771()
-	int SAMMain()
+	static int SAMMain()
 	{
 	    Init();
 	    phonemeindex[255] = 32; //to prevent buffer overflow
@@ -155,8 +155,9 @@ public static partial class UnitySAM
 
 
 #error CONTINUE HERE!
+
 	//void Code48547()
-	void PrepareOutput()
+	static void PrepareOutput()
 	{
 		A = 0;
 		X = 0;
@@ -201,7 +202,7 @@ public static partial class UnitySAM
 	}
 
 	//void Code48431()
-	void InsertBreath()
+	static void InsertBreath()
 	{
 		int mem54;
 		int mem55;
@@ -210,7 +211,7 @@ public static partial class UnitySAM
 		X++;
 		mem55 = 0;
 		int mem66 = 0;
-		while(1)
+		while(true)
 		{
 			//pos48440:
 			X = mem66;
@@ -265,11 +266,11 @@ public static partial class UnitySAM
 
 
 	//void Code41883()
-	void CopyStress()
+	static void CopyStress()
 	{
 		// loop thought all the phonemes to be output
 		int pos=0; //mem66
-		while(1)
+		while(true)
 		{
 			// get the phomene
 			Y = phonemeindex[pos];
@@ -308,7 +309,7 @@ public static partial class UnitySAM
 
 
 	//void Code41014()
-	void Insert(int position/*var57*/, int mem60, int mem59, int mem58)
+	static void Insert(int position/*var57*/, int mem60, int mem59, int mem58)
 	{
 		int i;
 		for(i=253; i >= position; i--) // ML : always keep last safe-guarding 255
@@ -375,7 +376,7 @@ public static partial class UnitySAM
 	// The character <0x9B> marks the end of text in input[]. When it is reached,
 	// the index 255 is placed at the end of the phonemeIndexTable[], and the
 	// function returns with a 1 indicating success.
-	int Parser1()
+	static int Parser1()
 	{
 		int i;
 		int sign1;
@@ -391,7 +392,7 @@ public static partial class UnitySAM
 
 		// THIS CODE MATCHES THE PHONEME LETTERS TO THE TABLE
 		// pos41078:
-		while(1)
+		while(true)
 		{
 			// GET THE FIRST CHARACTER FROM THE PHONEME BUFFER
 			sign1 = input[X];
@@ -505,7 +506,7 @@ public static partial class UnitySAM
 
 	//change phonemelength depedendent on stress
 	//void Code41203()
-	void SetPhonemeLength()
+	static void SetPhonemeLength()
 	{
 		int A;
 		int position = 0;
@@ -525,7 +526,7 @@ public static partial class UnitySAM
 	}
 
 
-	void Code41240()
+	static void Code41240()
 	{
 		int pos=0;
 
@@ -592,7 +593,7 @@ public static partial class UnitySAM
 
 
 	//void Code41397()
-	void Parser2()
+	static void Parser2()
 	{
 		if (debug) printf("Parser2\n");
 		int pos = 0; //mem66;
@@ -600,7 +601,7 @@ public static partial class UnitySAM
 
 
 		// Loop through phonemes
-		while(1)
+		while(true)
 		{
 			// SET X TO THE CURRENT POSITION
 			X = pos;
@@ -1057,7 +1058,7 @@ public static partial class UnitySAM
 
 		// iterate through the phoneme list
 		int loopIndex=0;
-		while(1)
+		while(true)
 		{
 			// get a phoneme
 			index = phonemeindex[X];
@@ -1132,7 +1133,7 @@ public static partial class UnitySAM
 		loopIndex = 0;
 		//pos48697
 
-		while(1)
+		while(true)
 		{
 			// get a phoneme
 			X = loopIndex;

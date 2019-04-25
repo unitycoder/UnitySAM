@@ -2,7 +2,7 @@
 
 public static partial class UnitySAM
 {
-	static void Print(string s)
+	static void printf(string s)
 	{
 		Debug.Log("Print:" + s);
 	}
