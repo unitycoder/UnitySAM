@@ -29,6 +29,12 @@ public class Test1 : MonoBehaviour
 
         string s = "HELLO";
 
+		s = "the imperial arcturan armada is ready for battle.";
+
+		s = "the imperial ark tooran arr mah dah is ready for battle.";
+
+		string output = null;
+
 		bool phonetic = false;
 		if (phonetic)
 		{
@@ -37,12 +43,11 @@ public class Test1 : MonoBehaviour
 		else
 		{
 			s = s + "[";
+			output = UnitySAM.TextToPhonemes(s);
 		}
 
 		Out(s);
 
-        var x = UnitySAM.TextToPhonemes(s);
-
-		Out(x);
+		Out(output);
 	}
 }

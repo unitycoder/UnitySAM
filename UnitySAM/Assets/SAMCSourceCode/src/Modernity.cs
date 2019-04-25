@@ -27,8 +27,6 @@ public static partial class UnitySAM
 
 		var what = ia;
 
-		what = inputtemp;
-
 		var bytes = new byte[ what.Length];
 		for (int i = 0; i < 256; i++)
 		{
