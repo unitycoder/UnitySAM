@@ -3,18 +3,8 @@ using UnityEngine;
 public static partial class UnitySAM
 {
     static int A, X, Y;
-    static bool debug;
-
+    
     static int[] inputtemp = new int[256];   // secure copy of input tab36096
-
-    static void Print(string s)
-    {
-        Debug.Log("Print:" + s);
-    }
-    static void PrintRule(int i)
-    {
-        Debug.Log("PrintRule:" + i.ToString());
-    }
 
     static void Code37055(int mem59)
     {

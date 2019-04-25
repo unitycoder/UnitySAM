@@ -1,177 +1,160 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include "debug.h"
-#include "sam.h"
-#include "render.h"
-#include "SamTabs.h"
 
-char input[256]; //tab39445
-//standard sam sound
-unsigned char speed = 72;
-unsigned char pitch = 64;
-unsigned char mouth = 128;
-unsigned char throat = 128;
-int singmode = 0;
+public static partial class UnitySAM
+{
+	static bool debug;
 
-extern int debug;
+	int[] input = new int[256]; //tab39445
 
-unsigned char mem39;
-unsigned char mem44;
-unsigned char mem47;
-unsigned char mem49;
-unsigned char mem50;
-unsigned char mem51;
-unsigned char mem53;
-unsigned char mem56;
+	//standard sam sound
+	int speed = 72;
+	int pitch = 64;
+	int mouth = 128;
+	int throat = 128;
+	int singmode = 0;
 
-unsigned char mem59=0;
+	int mem39;
+	int mem44;
+	int mem47;
+	int mem49;
+	int mem50;
+	int mem51;
+	int mem53;
+	int mem56;
 
-unsigned char A, X, Y;
+	int mem59=0;
 
-unsigned char stress[256]; //numbers from 0 to 8
-unsigned char phonemeLength[256]; //tab40160
-unsigned char phonemeindex[256];
+	int[] stress = new int[256]; //numbers from 0 to 8
+	int[] phonemeLength = new int[256]; //tab40160
+	int[] phonemeindex = new int[256];
 
-unsigned char phonemeIndexOutput[60]; //tab47296
-unsigned char stressOutput[60]; //tab47365
-unsigned char phonemeLengthOutput[60]; //tab47416
-
-
-
+	int[] phonemeIndexOutput = new int[60]; //tab47296
+	int[] stressOutput = new int[60]; //tab47365
+	int[] phonemeLengthOutput = new int[60]; //tab47416
 
 // contains the final soundbuffer
-int bufferpos=0;
-char *buffer = NULL;
+	int bufferpos=0;
+	int[] buffer;
+
+	void SetInput(int[] _input)
+	{
+	    int l = strlen(_input);
+	    if (l > 254) l = 254;
+	    for(int i=0; i<l; i++)
+		{
+	        input[i] = _input[i];
+		}
+	    input[l] = 0;
+	}
+
+	void SetSpeed(int _speed) {speed = _speed;}
+	void SetPitch(int _pitch) {pitch = _pitch;}
+	void SetMouth(int _mouth) {mouth = _mouth;}
+	void SetThroat(int _throat) {throat = _throat;}
+	void EnableSingmode() {singmode = 1;}
+
+	//	char* GetBuffer(){return buffer;}
+	//	int GetBufferLength(){return bufferpos;}
+
+	// 168=pitches
+	// 169=frequency1
+	// 170=frequency2
+	// 171=frequency3
+	// 172=amplitude1
+	// 173=amplitude2
+	// 174=amplitude3
 
 
-void SetInput(char *_input)
-{
-    int i, l;
-    l = strlen(_input);
-    if (l > 254) l = 254;
-    for(i=0; i<l; i++)
-        input[i] = _input[i];
-    input[l] = 0;
-}
+	void Init()
+	{
+	    SetMouthThroat( mouth, throat);
 
-void SetSpeed(unsigned char _speed) {speed = _speed;}
-void SetPitch(unsigned char _pitch) {pitch = _pitch;}
-void SetMouth(unsigned char _mouth) {mouth = _mouth;}
-void SetThroat(unsigned char _throat) {throat = _throat;}
-void EnableSingmode() {singmode = 1;}
-char* GetBuffer(){return buffer;}
-int GetBufferLength(){return bufferpos;}
+	    bufferpos = 0;
+	    // TODO, check for free the memory, 10 seconds of output should be more than enough
+		buffer = new int[22050*10];
 
-void Init();
-int Parser1();
-void Parser2();
-int SAMMain();
-void CopyStress();
-void SetPhonemeLength();
-void AdjustLengths();
-void Code41240();
-void Insert(unsigned char position, unsigned char mem60, unsigned char mem59, unsigned char mem58);
-void InsertBreath();
-void PrepareOutput();
-void SetMouthThroat(unsigned char mouth, unsigned char throat);
+	    /*
+	    freq2data = &mem[45136];
+	    freq1data = &mem[45056];
+	    freq3data = &mem[45216];
+	    */
+	    //pitches = &mem[43008];
+	    /*
+	    frequency1 = &mem[43264];
+	    frequency2 = &mem[43520];
+	    frequency3 = &mem[43776];
+	    */
+	    /*
+	    amplitude1 = &mem[44032];
+	    amplitude2 = &mem[44288];
+	    amplitude3 = &mem[44544];
+	    */
+	    //phoneme = &mem[39904];
+	    /*
+	    ampl1data = &mem[45296];
+	    ampl2data = &mem[45376];
+	    ampl3data = &mem[45456];
+	    */
 
-// 168=pitches
-// 169=frequency1
-// 170=frequency2
-// 171=frequency3
-// 172=amplitude1
-// 173=amplitude2
-// 174=amplitude3
+	    for(int i=0; i<256; i++)
+	    {
+	        stress[i] = 0;
+	        phonemeLength[i] = 0;
+	    }
 
+	    for(int i=0; i<60; i++)
+	    {
+	        phonemeIndexOutput[i] = 0;
+	        stressOutput[i] = 0;
+	        phonemeLengthOutput[i] = 0;
+	    }
+	    phonemeindex[255] = 255; //to prevent buffer overflow // ML : changed from 32 to 255 to stop freezing with long inputs
 
-void Init()
-{
-    int i;
-    SetMouthThroat( mouth, throat);
-
-    bufferpos = 0;
-    // TODO, check for free the memory, 10 seconds of output should be more than enough
-    buffer = malloc(22050*10);
-
-    /*
-    freq2data = &mem[45136];
-    freq1data = &mem[45056];
-    freq3data = &mem[45216];
-    */
-    //pitches = &mem[43008];
-    /*
-    frequency1 = &mem[43264];
-    frequency2 = &mem[43520];
-    frequency3 = &mem[43776];
-    */
-    /*
-    amplitude1 = &mem[44032];
-    amplitude2 = &mem[44288];
-    amplitude3 = &mem[44544];
-    */
-    //phoneme = &mem[39904];
-    /*
-    ampl1data = &mem[45296];
-    ampl2data = &mem[45376];
-    ampl3data = &mem[45456];
-    */
-
-    for(i=0; i<256; i++)
-    {
-        stress[i] = 0;
-        phonemeLength[i] = 0;
-    }
-
-    for(i=0; i<60; i++)
-    {
-        phonemeIndexOutput[i] = 0;
-        stressOutput[i] = 0;
-        phonemeLengthOutput[i] = 0;
-    }
-    phonemeindex[255] = 255; //to prevent buffer overflow // ML : changed from 32 to 255 to stop freezing with long inputs
-
-}
+	}
 
 
-//int Code39771()
-int SAMMain()
-{
-    Init();
-    phonemeindex[255] = 32; //to prevent buffer overflow
+	//int Code39771()
+	int SAMMain()
+	{
+	    Init();
+	    phonemeindex[255] = 32; //to prevent buffer overflow
 
-    if (!Parser1()) return 0;
-    if (debug)
-        PrintPhonemes(phonemeindex, phonemeLength, stress);
-    Parser2();
-    CopyStress();
-    SetPhonemeLength();
-    AdjustLengths();
-    Code41240();
-    do
-    {
-        A = phonemeindex[X];
-        if (A > 80)
-        {
-            phonemeindex[X] = 255;
-            break; // error: delete all behind it
-        }
-        X++;
-    } while (X != 0);
+	    if (!Parser1()) return 0;
 
-    //pos39848:
-    InsertBreath();
+	    if (debug)
+	        PrintPhonemes(phonemeindex, phonemeLength, stress);
+	    
+		Parser2();
+	    CopyStress();
+	    SetPhonemeLength();
+	    AdjustLengths();
+	    Code41240();
+	    do
+	    {
+	        A = phonemeindex[X];
+	        if (A > 80)
+	        {
+	            phonemeindex[X] = 255;
+	            break; // error: delete all behind it
+	        }
+	        X++;
+	    } while (X != 0);
 
-    //mem[40158] = 255;
-    if (debug)
-    {
-        PrintPhonemes(phonemeindex, phonemeLength, stress);
-    }
+	    //pos39848:
+	    InsertBreath();
 
-    PrepareOutput();
+	    //mem[40158] = 255;
+	    if (debug)
+	    {
+	        PrintPhonemes(phonemeindex, phonemeLength, stress);
+	    }
 
-    return 1;
-}
+	    PrepareOutput();
+
+	    return 1;
+	}
+
+
+#error CONTINUE HERE!
 
 
 //void Code48547()
@@ -222,13 +205,13 @@ void PrepareOutput()
 //void Code48431()
 void InsertBreath()
 {
-    unsigned char mem54;
-    unsigned char mem55;
-    unsigned char index; //variable Y
+    int mem54;
+    int mem55;
+    int index; //variable Y
     mem54 = 255;
     X++;
     mem55 = 0;
-    unsigned char mem66 = 0;
+    int mem66 = 0;
     while(1)
     {
         //pos48440:
@@ -287,7 +270,7 @@ void InsertBreath()
 void CopyStress()
 {
     // loop thought all the phonemes to be output
-    unsigned char pos=0; //mem66
+    int pos=0; //mem66
     while(1)
     {
         // get the phomene
@@ -327,7 +310,7 @@ void CopyStress()
 
 
 //void Code41014()
-void Insert(unsigned char position/*var57*/, unsigned char mem60, unsigned char mem59, unsigned char mem58)
+void Insert(int position/*var57*/, int mem60, int mem59, int mem58)
 {
     int i;
     for(i=253; i >= position; i--) // ML : always keep last safe-guarding 255
@@ -397,9 +380,9 @@ void Insert(unsigned char position/*var57*/, unsigned char mem60, unsigned char 
 int Parser1()
 {
     int i;
-    unsigned char sign1;
-    unsigned char sign2;
-    unsigned char position = 0;
+    int sign1;
+    int sign2;
+    int position = 0;
     X = 0;
     A = 0;
     Y = 0;
@@ -526,7 +509,7 @@ pos41134:
 //void Code41203()
 void SetPhonemeLength()
 {
-    unsigned char A;
+    int A;
     int position = 0;
     while(phonemeindex[position] != 255 )
     {
@@ -546,11 +529,11 @@ void SetPhonemeLength()
 
 void Code41240()
 {
-    unsigned char pos=0;
+    int pos=0;
 
     while(phonemeindex[pos] != 255)
     {
-        unsigned char index; //register AC
+        int index; //register AC
         X = pos;
         index = phonemeindex[pos];
         if ((flags[index]&2) == 0)
@@ -614,8 +597,8 @@ void Code41240()
 void Parser2()
 {
     if (debug) printf("Parser2\n");
-    unsigned char pos = 0; //mem66;
-    unsigned char mem58 = 0;
+    int pos = 0; //mem66;
+    int mem58 = 0;
 
 
   // Loop through phonemes
@@ -900,7 +883,7 @@ pos41611:
         if (A == 60)   // 'G'
         {
 // Get the following character
-            unsigned char index = phonemeindex[pos+1];
+            int index = phonemeindex[pos+1];
 
 // At end of buffer?
             if (index == 255) //prevent buffer overflow
@@ -1072,10 +1055,10 @@ void AdjustLengths()
 
     // loop index
     X = 0;
-    unsigned char index;
+    int index;
 
     // iterate through the phoneme list
-    unsigned char loopIndex=0;
+    int loopIndex=0;
     while(1)
     {
         // get a phoneme
@@ -1418,7 +1401,7 @@ if (debug) printf("phoneme %d (%c%c) length %d\n", X, signInputTable1[phonemeind
 
 // -------------------------------------------------------------------------
 // ML : Code47503 is division with remainder, and mem50 gets the sign
-void Code47503(unsigned char mem52)
+void Code47503(int mem52)
 {
 
     Y = 0;
