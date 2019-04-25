@@ -16,19 +16,6 @@ public static partial class UnitySAM
 
 	static int[] sampledConsonantFlag = new int[256]; // tab44800
 
-
-	// contains the final soundbuffer
-	static int bufferpos;
-	static int buffer
-	{
-		set
-		{
-			// <WIP> write value to a stream of bytes
-		}
-	}
-
-
-
 	//timetable for more accurate c64 simulation
 	readonly static int[][] timetable = new int[][]
 	{
@@ -41,29 +28,22 @@ public static partial class UnitySAM
 
 	static int oldtimetableindex = 0;
 
+	static	Buffer	buf;
 
-	// Meh, we'll revisit these stream in/out methods when we get there...
-
-	//void Output8BitAry(int index, int ary[5])
-	//{
-	//    int k;
-	//    bufferpos += timetable[oldtimetableindex][index];
-	//    oldtimetableindex = index;
-	//    // write a little bit in advance
-	//    for(k=0; k<5; k++)
-	//        buffer[bufferpos/50 + k] = ary[k];
-	//}
-	//void Output8Bit(int index, int A)
-	//{
-	//    int ary[5] = {A,A,A,A,A};
-	//    Output8BitAry(index, ary);
-	//}
-
-
-
-
-
-
+	static void Output8BitAry(int index, int[] ary5)
+	{
+	    int k;
+	    bufferpos += timetable[oldtimetableindex][index];
+	    oldtimetableindex = index;
+	    // write a little bit in advance
+	    for(k=0; k<5; k++)
+			buf.Set( bufferpos/50 + k, ary5[k]);
+	}
+	static void Output8Bit(int index, int A)
+	{
+	    int[] ary = {A,A,A,A,A};
+	    Output8BitAry(index, ary);
+	}
 
 
 	//written by me because of different table positions.
@@ -165,18 +145,8 @@ public static partial class UnitySAM
 
 
 	// Code48227()
-	static void RenderSample(int* mem66)
+	static void RenderSample(ref int mem66)
 	{
-
-
-
-		#error Continue porting here...
-
-
-
-
-
-
 		int tempA = 0;
 		// current phoneme's index
 		mem49 = Y;
@@ -272,7 +242,7 @@ public static partial class UnitySAM
 		// number of samples?
 		phase1 = A ^ 255;
 
-		Y = *mem66;
+		Y = mem66;
 		do
 		{
 			//pos48321:
@@ -308,14 +278,14 @@ public static partial class UnitySAM
 					Output8Bit(4, (X & 0xf) * 16);
 				}
 
-				mem56--;
+				DEC8( ref mem56);
 			} while (mem56 != 0);
 
 			// move ahead in the table
-			Y++;
+			INC8( ref Y);
 
 			// continue until counter done
-			phase1++;
+			INC8( ref phase1);
 
 		} while (phase1 != 0);
 		//  if (phase1 != 0) goto pos48321;
@@ -323,11 +293,17 @@ public static partial class UnitySAM
 		// restore values and return
 		A = 1;
 		mem44 = 1;
-		*mem66 = Y;
+		mem66 = Y;
 		Y = mem49;
 		return;
 	}
 
+
+	static int abs( int x)
+	{
+		if (x < 0) return -x;
+		return x;
+	}
 
 
 	// RENDER THE PHONEMES IN THE LIST
@@ -347,12 +323,16 @@ public static partial class UnitySAM
 
 
 	//void Code47574()
-	void Render()
+	static void Render()
 	{
+		buf = new Buffer();
+
 		int phase1 = 0;  //mem43
 		int phase2 = 0;
 		int phase3 = 0;
+
 		int mem66 = 0;
+
 		int mem38 = 0;
 		int mem40 = 0;
 		int speedcounter = 0; //mem45
@@ -776,7 +756,7 @@ public static partial class UnitySAM
 
 		if (debug)
 		{
-			PrintOutput(sampledConsonantFlag, frequency1, frequency2, frequency3, amplitude1, amplitude2, amplitude3, pitches);
+//			PrintOutput(sampledConsonantFlag, frequency1, frequency2, frequency3, amplitude1, amplitude2, amplitude3, pitches);
 		}
 
 		// PROCESS THE FRAMES
@@ -790,6 +770,8 @@ public static partial class UnitySAM
 
 		//finally the loop for sound output
 		//pos48078:
+		bool pos48159bool = false;
+
 		while (true)
 		{
 			// get the sampled information on the phoneme
@@ -801,7 +783,7 @@ public static partial class UnitySAM
 			if (A != 0)
 			{
 				// render the sample for the phoneme
-				RenderSample(&mem66);
+				RenderSample(ref mem66);
 
 				// skip ahead two in the phoneme buffer
 				Y += 2;
@@ -826,6 +808,7 @@ public static partial class UnitySAM
 					int mux = sin1 + sin2 + rect;
 					mux /= 32;
 					mux += 128; // Go from signed to unsigned amplitude
+					mux &= 255;
 					ary[k] = mux;
 					p1 += frequency1[Y] * 256 / 4; // Compromise, this becomes a shift and works well
 					p2 += frequency2[Y] * 256 / 4;
@@ -833,12 +816,12 @@ public static partial class UnitySAM
 				}
 				// output the accumulated value
 				Output8BitAry(0, ary);
-				speedcounter--;
+				DEC8( ref speedcounter);
 				if (speedcounter != 0) goto pos48155;
-				Y++; //go to next amplitude
+				INC8( ref Y); //go to next amplitude
 
 				// decrement the frame count
-				mem48--;
+				DEC8( ref mem48);
 			}
 
 			// if the frame count is zero, exit the loop
@@ -847,12 +830,15 @@ public static partial class UnitySAM
 			pos48155:
 
 			// decrement the remaining length of the glottal pulse
-			mem44--;
+			DEC8( ref mem44);
 
+			pos48159:
 			// finished with a glottal pulse?
-			if (mem44 == 0)
+			if (mem44 == 0 || pos48159bool)
 			{
-				pos48159:
+//				pos48159:			// former location of label here
+				pos48159bool = false;
+
 				// fetch the next glottal pulse length
 				A = pitches[Y];
 				mem44 = A;
@@ -868,22 +854,27 @@ public static partial class UnitySAM
 			}
 
 			// decrement the count
-			mem38--;
+			DEC8( ref mem38);
 
 			// is the count non-zero and the sampled flag is zero?
 			if ((mem38 != 0) || (mem39 == 0))
 			{
 				// reset the phase of the formants to match the pulse
 				phase1 += frequency1[Y];
+				phase1 &= 255;
 				phase2 += frequency2[Y];
+				phase2 &= 255;
 				phase3 += frequency3[Y];
+				phase3 &= 255;
 				continue;
 			}
 
 			// voiced sampled phonemes interleave the sample with the
 			// glottal pulse. The sample flag is non-zero, so render
 			// the sample for the phoneme.
-			RenderSample(&mem66);
+			RenderSample( ref mem66);
+
+			pos48159bool = true;
 			goto pos48159;
 		} //while
 
@@ -915,21 +906,21 @@ public static partial class UnitySAM
 					X = 26;
 					// mem[54296] = X;
 					bufferpos += 150;
-					buffer[bufferpos / 50] = (X & 15)*16;
+					buf.Set( bufferpos / 50, (X & 15)*16);
 				} else
 				{
 					//mem[54296] = 6;
 					X=6;
 					bufferpos += 150;
-					buffer[bufferpos / 50] = (X & 15)*16;
+					buf.Set(bufferpos / 50, (X & 15)*16);
 				}
 
 				for(X = wait2; X>0; X--); //wait
 				mem56--;
 			} while(mem56 != 0);
 
-			Y++;
-			phase1++;
+			INC8( ref Y);
+			INC8( ref phase1);
 
 		} while (phase1 != 0);
 		//  if (phase1 != 0) goto pos48321;
@@ -945,7 +936,7 @@ public static partial class UnitySAM
 	// index X. A rising inflection is used for questions, and
 	// a falling inflection is used for statements.
 
-	void AddInflection(int mem48, int phase1)
+	static void AddInflection(int mem48, int phase1)
 	{
 		//pos48372:
 		//  mem48 = 255;
@@ -964,7 +955,7 @@ public static partial class UnitySAM
 
 		// FIXME: Explain this fix better, it's not obvious
 		// ML : A =, fixes a problem with invalid pitch with '.'
-		while ((A = pitches[X]) == 127) X++;
+		while ((A = pitches[X]) == 127) INC8( ref X);
 
 
 		pos48398:
@@ -973,6 +964,7 @@ public static partial class UnitySAM
 
 		// add the inflection direction
 		A += mem48;
+		A &= 255;
 		phase1 = A;
 
 		// set the inflection
@@ -980,7 +972,7 @@ public static partial class UnitySAM
 		pos48406:
 
 		// increment the position
-		X++;
+		INC8( ref X);
 
 		// exit if the punctuation has been reached
 		if (X == mem49) return; //goto pos47615;
@@ -993,8 +985,8 @@ public static partial class UnitySAM
     SAM's voice can be altered by changing the frequencies of the
     mouth formant (F1) and the throat formant (F2). Only the voiced
     phonemes (5-29 and 48-53) are altered.
-*/
-	void SetMouthThroat(int mouth, int throat)
+	*/
+	static void SetMouthThroat(int mouth, int throat)
 	{
 		int initialFrequency;
 		int newFrequency = 0;
@@ -1034,7 +1026,7 @@ public static partial class UnitySAM
 			initialFrequency = throatFormants5_29[pos];
 			if (initialFrequency != 0) newFrequency = trans(throat, initialFrequency);
 			freq2data[pos] = newFrequency;
-			pos++;
+			INC8( ref pos);
 		}
 
 		//pos39059:
@@ -1059,7 +1051,7 @@ public static partial class UnitySAM
 
 
 	//return = (mem39212*mem39213) >> 1
-	int trans(int mem39212, int mem39213)
+	static int trans(int mem39212, int mem39213)
 	{
 		//pos39008:
 		int carry;
@@ -1087,16 +1079,16 @@ public static partial class UnitySAM
 				mem39215 = A;
 			}
 			temp = mem39215 & 1;
-			mem39215 = (mem39215 >> 1) | (carry ? 128 : 0);
+			mem39215 = (mem39215 >> 1) | ((carry != 0) ? 128 : 0);
 			carry = temp;
 			//39033: ROR 39215
-			X--;
+			DEC8( ref X);
 		} while (X != 0);
 		temp = mem39214 & 128;
-		mem39214 = (mem39214 << 1) | (carry ? 1 : 0);
+		mem39214 = (mem39214 << 1) | ((carry != 0) ? 1 : 0);
 		carry = temp;
 		temp = mem39215 & 128;
-		mem39215 = (mem39215 << 1) | (carry ? 1 : 0);
+		mem39215 = (mem39215 << 1) | ((carry != 0) ? 1 : 0);
 		carry = temp;
 
 		return mem39215;
