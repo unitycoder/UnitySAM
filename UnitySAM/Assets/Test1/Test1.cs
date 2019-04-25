@@ -53,6 +53,14 @@ public class Test1 : MonoBehaviour
 		var ia = UnitySAM.IntArray( s);
 		UnitySAM.SetInput(ia);
 
-		UnitySAM.SAMMain();
+		var buf = UnitySAM.SAMMain();
+		if (buf == null)
+		{
+			Debug.LogError( "Buffer was null");
+		}
+		else
+		{
+			Debug.Log( "Buffer size is " + buf.GetSize());
+		}
 	}
 }

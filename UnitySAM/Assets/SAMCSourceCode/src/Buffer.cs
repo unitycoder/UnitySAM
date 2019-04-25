@@ -16,6 +16,11 @@ public class Buffer
 		return Data.ToArray();
 	}
 
+	public int GetSize()
+	{
+		return Data.Count;
+	}
+
 	public void Set( int position, int data)
 	{
 		while( position >= Data.Count)

@@ -39,6 +39,9 @@ public static partial class UnitySAM
 	public static void SetInput(int[] _input)
 	{
 		int l = _input.Length;
+
+		UnityEngine.Debug.Log( "SetInput(): " + l.ToString());
+
 	    if (l > 254) l = 254;
 	    for(int i=0; i<l; i++)
 		{
@@ -115,12 +118,12 @@ public static partial class UnitySAM
 
 
 	//int Code39771()
-	public static int SAMMain()
+	public static Buffer SAMMain()
 	{
 	    Init();
 	    phonemeindex[255] = 32; //to prevent buffer overflow
 
-	    if (!Parser1()) return 0;
+	    if (!Parser1()) return null;
 
 	    if (debug)
 	        PrintPhonemes(phonemeindex, phonemeLength, stress);
@@ -152,7 +155,7 @@ public static partial class UnitySAM
 
 	    PrepareOutput();
 
-	    return 1;
+		return buf;
 	}
 
 
@@ -406,7 +409,7 @@ public static partial class UnitySAM
 			}
 
 			// GET THE NEXT CHARACTER FROM THE BUFFER
-			X++;
+			INC8( ref X);
 			sign2 = input[X];
 
 			// NOW sign1 = FIRST CHARACTER OF PHONEME, AND sign2 = SECOND CHARACTER OF PHONEME
@@ -436,7 +439,7 @@ public static partial class UnitySAM
 					// ADVANCE THE POINTER TO THE phonemeIndexTable
 					position++;
 					// ADVANCE THE POINTER TO THE phonemeInputBuffer
-					X++;
+					INC8( ref X);
 
 					// CONTINUE PARSING
 					continue;
@@ -446,7 +449,8 @@ public static partial class UnitySAM
 			// NO MATCH, TRY TO MATCH ON FIRST CHARACTER TO WILDCARD NAMES (ENDING WITH '*')
 
 			// ADVANCE TO THE NEXT POSITION
-			Y++;
+			INC8( ref Y);
+
 			// IF NOT END OF TABLE, CONTINUE
 			if (Y != 81) goto pos41095;
 
@@ -472,7 +476,9 @@ public static partial class UnitySAM
 					continue;
 				}
 			}
-			Y++;
+
+			INC8(ref Y);
+
 			if (Y != 81) goto pos41134; //81 is size of PHONEME NAME table
 
 			// FAILED TO MATCH WITH A WILDCARD. ASSUME THIS IS A STRESS
@@ -485,7 +491,7 @@ public static partial class UnitySAM
 			while( (sign1 != stressInputTable[Y]) && (Y>0))
 			{
 				// DECREMENT INDEX
-				Y--;
+				DEC8( ref Y);
 			}
 
 			// REACHED THE END OF THE SEARCH WITHOUT BREAKING OUT OF LOOP?
@@ -726,14 +732,15 @@ public static partial class UnitySAM
 				if (A != 0)
 				{
 					// Get the following phoneme
-					X++;
+					INC8( ref X);
+
 					A = phonemeindex[X];
 					// If following phoneme is a pause
 
 					if (A == 0)
 					{
 						// Get the phoneme following pause
-						X++;
+						INC8( ref X);
 						Y = phonemeindex[X];
 
 						// Check for end of buffer flag
@@ -775,7 +782,7 @@ public static partial class UnitySAM
 			if (A != 23) goto pos41611;     // 'R'
 
 			// Look at prior phoneme
-			X--;
+			DEC8( ref X);
 			A = phonemeindex[pos-1];
 			//pos41567:
 			if (A == 69)                    // 'T'
@@ -997,7 +1004,8 @@ public static partial class UnitySAM
 			if ((flags[phonemeindex[X-1]] & 128) == 0) {pos++; continue;}
 
 			// Get next phoneme
-			X++;
+			INC8( ref X);
+
 			A = phonemeindex[X];
 			//pos41841
 			// Is the next phoneme a pause?
@@ -1070,7 +1078,7 @@ public static partial class UnitySAM
 			if((flags2[index] & 1) == 0)
 			{
 				// skip
-				X++;
+				INC8(ref X);
 				continue;
 			}
 
@@ -1081,7 +1089,7 @@ public static partial class UnitySAM
 			pos48644:
 
 			// back up one phoneme
-			X--;
+			DEC8( ref X);
 
 			// stop once the beginning is reached
 			if(X == 0) break;
@@ -1121,10 +1129,10 @@ public static partial class UnitySAM
 
 				}
 				// keep moving forward
-				X++;
+				INC8( ref X);
 			} while (X != loopIndex);
 			//  if (X != loopIndex) goto pos48657;
-			X++;
+			INC8( ref X);
 		}  // while
 
 		// Similar to the above routine, but shorten vowels under some circumstances
@@ -1147,7 +1155,7 @@ public static partial class UnitySAM
 			if (A != 0)
 			{
 				// get next phoneme
-				X++;
+				INC8( ref X);
 				index = phonemeindex[X];
 
 				// get flags
@@ -1163,7 +1171,7 @@ public static partial class UnitySAM
 					if ((index == 18) || (index == 19))  // 'RX' & 'LX'
 					{
 						// get the next phoneme
-						X++;
+						INC8( ref X);
 						index = phonemeindex[X];
 
 						// next phoneme a consonant?
@@ -1215,7 +1223,7 @@ public static partial class UnitySAM
 					// <VOWEL> <P*, T*, K*, KX>
 
 					// move back
-					X--;
+					DEC8( ref X);
 
 					if (debug) printf("RULE: <VOWEL> <UNVOICED PLOSIVE> - decrease vowel by 1/8th\n");
 					if (debug) printf("PRE\n");
@@ -1269,7 +1277,7 @@ public static partial class UnitySAM
 				// M*, N*, NX,
 
 				// get the next phoneme
-				X++;
+				INC8( ref X);
 				index = phonemeindex[X];
 
 				// end of buffer?
@@ -1321,7 +1329,7 @@ public static partial class UnitySAM
 				do
 				{
 					// move ahead
-					X++;
+					INC8( ref X);
 					index = phonemeindex[X];
 				} while(index == 0);
 
@@ -1344,7 +1352,8 @@ public static partial class UnitySAM
 //				if (debug) printf("phoneme %d (%c%c) length %d\n", X-1, signInputTable1[phonemeindex[X-1]], signInputTable2[phonemeindex[X-1]], phonemeLength[X-1]);
 
 				// X gets overwritten, so hold prior X value for debug statement
-				int debugX = X;
+//				int debugX = X;
+
 				// shorten the prior phoneme length to (length/2 + 1)
 				phonemeLength[X] = (phonemeLength[X] >> 1) + 1;
 				X = loopIndex;
@@ -1421,7 +1430,7 @@ public static partial class UnitySAM
 			if (A >= mem52)
 			{
 				A = A - mem52;
-				mem53++;
+				INC8( ref mem53);
 			}
 		}
 
