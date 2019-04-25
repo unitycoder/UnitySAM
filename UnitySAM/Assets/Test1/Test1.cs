@@ -29,6 +29,16 @@ public class Test1 : MonoBehaviour
 
         string s = "HELLO";
 
+		bool phonetic = false;
+		if (phonetic)
+		{
+			s = s + "\0x9b";
+		}
+		else
+		{
+			s = s + "[";
+		}
+
 		Out(s);
 
         var x = UnitySAM.TextToPhonemes(s);

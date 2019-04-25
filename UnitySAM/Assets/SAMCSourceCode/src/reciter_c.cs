@@ -38,7 +38,7 @@ public static partial class UnitySAM
         return rules[address + Y];
     }
 
-    static int TextToPhonemes( int[] input) // Code36484
+    static bool TextToPhonemes( int[] input) // Code36484
     {
         //unsigned char *tab39445 = &mem[39445];   //input and output
         //unsigned char mem29;
@@ -75,6 +75,7 @@ public static partial class UnitySAM
             Y++;
         } while (Y != 255);
 
+		printf( inputtemp);
 
         X = 255;
         inputtemp[X] = 27;
@@ -104,7 +105,7 @@ public static partial class UnitySAM
                 input[X] = 155;
                 //goto pos36542;
                 //          Code39771();    //Code39777();
-                return 1;
+                return true;
             }
 
             //pos36579:
@@ -136,7 +137,7 @@ public static partial class UnitySAM
         if (A != 0) goto pos36677;
         A = 32;
 
-		if (X >= inputtemp.Length) return 0;
+		if (X >= inputtemp.Length) return true;
 
         inputtemp[X] = ' ';
         mem56++;
@@ -155,7 +156,7 @@ public static partial class UnitySAM
         mem36653 = A;
         //  mem29 = A; // not used
         //  Code36538(); das ist eigentlich
-        return 1;
+        return true;
         //Code39771();
         //go on if there is more input ???
 
@@ -167,7 +168,7 @@ public static partial class UnitySAM
         if (A == 0)
         {
             //36683: BRK
-            return 0;
+			return false;
         }
 
         // go to the right rules for this character.
@@ -272,7 +273,7 @@ public static partial class UnitySAM
         if (A == ':') goto pos37040;
         //  Code42041();    //Error
         //36894: BRK
-        return 0;
+		return false;
 
     // --------------
 
@@ -446,7 +447,7 @@ public static partial class UnitySAM
     //pos37291:
         //  Code42041(); //Error
         //37294: BRK
-        return 0;
+		return false;
 
     // --------------
     pos37295:

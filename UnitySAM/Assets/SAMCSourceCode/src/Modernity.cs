@@ -19,14 +19,20 @@ public static partial class UnitySAM
 
 	public static string TextToPhonemes(string s)
 	{
-		TextToPhonemes(IntArray( s));
+		var ia = IntArray( s);
 
-		var bytes = new byte[ inputtemp.Length];
+		bool success = TextToPhonemes(ia);
+
+		var what = ia;
+
+		what = inputtemp;
+
+		var bytes = new byte[ what.Length];
 		for (int i = 0; i < 256; i++)
 		{
-			if (inputtemp[i] != 0)
+			if (what[i] != 0)
 			{
-				bytes[i] = (byte)inputtemp[i];
+				bytes[i] = (byte)what[i];
 			}
 		}
 
