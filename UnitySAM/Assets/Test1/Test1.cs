@@ -35,23 +35,29 @@ public class Test1 : MonoBehaviour
 
 		string output = null;
 
+		int[] ints = null;
+
 		bool phonetic = false;
 		if (phonetic)
 		{
-			s = s + "\0x9b";
+			ints = UnitySAM.IntArray( s);
+
+			var L = new List<int>(ints);
+			L.Add(155);
+			ints = L.ToArray();
+				
+			output = s + "\0x9b";
 		}
 		else
 		{
-			s = s + "[";
-			output = UnitySAM.TextToPhonemes(s);
+			output = UnitySAM.TextToPhonemes(s + "[", out ints);
 		}
 
 		Out("Input:" + s);
 
 		Out("Phonemes:" + output);
 
-		var ia = UnitySAM.IntArray( s);
-		UnitySAM.SetInput(ia);
+		UnitySAM.SetInput(ints);
 
 		var buf = UnitySAM.SAMMain();
 		if (buf == null)

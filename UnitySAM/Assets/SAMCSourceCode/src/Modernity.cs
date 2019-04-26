@@ -6,34 +6,40 @@ public static partial class UnitySAM
 	{
 		s = s.ToUpper();
 
-		var bytes = System.Text.Encoding.ASCII.GetBytes(s);
+		int x = s.Length;
+
+		var bytes = System.Text.Encoding.UTF8.GetBytes(s);
 
 		int[] intarray = new int[256];
 		for (int i = 0; i < bytes.Length; i++)
 		{
 			intarray[i] = bytes[i];
-			intarray[i + 1] = 0x80;
 		}
 		return intarray;
 	}
 
-	public static string TextToPhonemes(string s)
+	public static string TextToPhonemes(string s, out int[] ints)
 	{
 		var ia = IntArray( s);
 
-		bool success = TextToPhonemes(ia);
+		bool success = TextToPhonemes(ref ia);
 
 		Debug.Log( "success = " + success);
 
 		var what = ia;
 
+		ints = what;
 		var bytes = new byte[ what.Length];
-		for (int i = 0; i < 256; i++)
+		for (int i = 0; i < what.Length; i++)
 		{
-			if (what[i] != 0)
+			if (what[i] == 0)
 			{
-				bytes[i] = (byte)what[i];
+				var copy = new int[i];
+				System.Array.Copy( what, copy, i);
+				what = copy;
+				break;
 			}
+			bytes[i] = (byte)what[i];
 		}
 
 		string result = System.Text.Encoding.UTF8.GetString(bytes);

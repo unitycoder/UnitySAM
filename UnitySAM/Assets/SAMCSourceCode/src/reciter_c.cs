@@ -50,7 +50,7 @@ public static partial class UnitySAM
 		xxx &= 255;
 	}
 
-    static bool TextToPhonemes( int[] input) // Code36484
+    static bool TextToPhonemes( ref int[] input) // Code36484
     {
         //unsigned char *tab39445 = &mem[39445];   //input and output
         //unsigned char mem29;
@@ -114,10 +114,19 @@ public static partial class UnitySAM
             {
 				INC8(ref mem56);
                 X = mem56;
+
                 A = 155;
                 input[X] = 155;
+				INC8( ref X);
+
                 //goto pos36542;
                 //          Code39771();    //Code39777();
+
+
+				var copy = new int[X];
+				System.Array.Copy( input, copy, X);
+				input = copy;
+
                 return true;
             }
 
@@ -259,7 +268,7 @@ public static partial class UnitySAM
     pos36791:
         while (true)
         {
-            mem66--;
+			DEC8( ref mem66);
             Y = mem66;
             A = GetRuleByte(mem62, Y);
             mem57 = A;
@@ -325,7 +334,7 @@ public static partial class UnitySAM
         if (A != 0) goto pos36930;
         A = inputtemp[X];
         if (A != 72) goto pos36700;
-        X--;
+		DEC8( ref X);
         A = inputtemp[X];
         if ((A == 67) || (A == 83)) goto pos36930;
         goto pos36700;
@@ -358,7 +367,7 @@ public static partial class UnitySAM
 
     pos37019:
         X = mem59;
-        X--;
+		DEC8( ref X);
         A = inputtemp[X];
         if ((A == 'E') || (A == 'I') || (A == 'Y')) goto pos37014;
         goto pos36700;
@@ -380,7 +389,7 @@ public static partial class UnitySAM
         if (A != 'E') goto pos37157;
         INC8( ref X);
         Y = inputtemp[X];
-        X--;
+		DEC8( ref X);
         A = tab36376[Y] & 128;
         if (A == 0) goto pos37108;
         INC8( ref X);

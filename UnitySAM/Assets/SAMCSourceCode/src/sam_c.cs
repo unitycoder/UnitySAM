@@ -179,7 +179,7 @@ public static partial class UnitySAM
 			}
 			if (A == 254)
 			{
-				X++;
+				INC8( ref X);
 				int temp = X;
 				//mem[48546] = X;
 				phonemeIndexOutput[Y] = 255;
@@ -192,15 +192,15 @@ public static partial class UnitySAM
 
 			if (A == 0)
 			{
-				X++;
+				INC8( ref X);
 				continue;
 			}
 
 			phonemeIndexOutput[Y] = A;
 			phonemeLengthOutput[Y] = phonemeLength[X];
 			stressOutput[Y] = stress[X];
-			X++;
-			Y++;
+			INC8( ref X);
+			INC8( ref Y);
 		}
 	}
 
@@ -211,7 +211,7 @@ public static partial class UnitySAM
 		int mem55;
 		int index; //variable Y
 		mem54 = 255;
-		X++;
+		INC8( ref X);
 		mem55 = 0;
 		int mem66 = 0;
 		while(true)
@@ -229,26 +229,26 @@ public static partial class UnitySAM
 					A = flags2[index]&1;
 					if(A != 0)
 					{
-						X++;
+						INC8( ref X);
 						mem55 = 0;
 						Insert(X, 254, mem59, 0);
-						mem66++;
-						mem66++;
+						INC8( ref mem66);
+						INC8( ref mem66);
 						continue;
 					}
 				}
 				if (index == 0) mem54 = X;
-				mem66++;
+				INC8( ref mem66);
 				continue;
 			}
 			X = mem54;
 			phonemeindex[X] = 31;   // 'Q*' glottal stop
 			phonemeLength[X] = 4;
 			stress[X] = 0;
-			X++;
+			INC8( ref X);
 			mem55 = 0;
 			Insert(X, 254, mem59, 0);
-			X++;
+			INC8( ref X);
 			mem66 = X;
 		}
 
@@ -282,30 +282,47 @@ public static partial class UnitySAM
 			if (Y == 255) return;
 
 			// if CONSONANT_FLAG set, skip - only vowels get stress
-			if ((flags[Y] & 64) == 0) {pos++; continue;}
+			if ((flags[Y] & 64) == 0)
+			{
+				INC8( ref pos);
+				continue;
+			}
 			// get the next phoneme
 			Y = phonemeindex[pos+1];
 			if (Y == 255) //prevent buffer overflow
 			{
-				pos++; continue;
+				INC8( ref pos);
+				continue;
 			} else
 				// if the following phoneme is a vowel, skip
-				if ((flags[Y] & 128) == 0)  {pos++; continue;}
+				if ((flags[Y] & 128) == 0)
+				{
+					INC8( ref pos);
+					continue;
+				}
 
 			// get the stress value at the next position
 			Y = stress[pos+1];
 
 			// if next phoneme is not stressed, skip
-			if (Y == 0)  {pos++; continue;}
+			if (Y == 0)
+			{
+				INC8( ref pos);
+				continue;
+			}
 
 			// if next phoneme is not a VOWEL OR ER, skip
-			if ((Y & 128) != 0)  {pos++; continue;}
+			if ((Y & 128) != 0)
+			{
+				INC8( ref pos);
+				continue;
+			}
 
 			// copy stress from prior phoneme to this one
-			stress[pos] = Y+1;
+			stress[pos] = (Y+1) & 255;
 
 			// advance pointer
-			pos++;
+			INC8( ref pos);
 		}
 
 	}
@@ -314,6 +331,11 @@ public static partial class UnitySAM
 	//void Code41014()
 	static void Insert(int position/*var57*/, int mem60, int mem59, int mem58)
 	{
+		position &= 255;
+		mem60 &= 255;
+		mem59 &= 255;
+		mem58 &= 255;
+
 		int i;
 		for(i=253; i >= position; i--) // ML : always keep last safe-guarding 255
 		{
@@ -437,7 +459,7 @@ public static partial class UnitySAM
 					phonemeindex[position] = Y;
 
 					// ADVANCE THE POINTER TO THE phonemeIndexTable
-					position++;
+					INC8( ref position);
 					// ADVANCE THE POINTER TO THE phonemeInputBuffer
 					INC8( ref X);
 
@@ -470,7 +492,7 @@ public static partial class UnitySAM
 					phonemeindex[position] = Y;
 
 					// ADVANCE THE POINTER
-					position++;
+					INC8( ref position);
 
 					// CONTINUE THROUGH THE LOOP
 					continue;
@@ -527,7 +549,7 @@ public static partial class UnitySAM
 			{
 				phonemeLength[position] = phonemeStressedLengthTable[phonemeindex[position]];
 			}
-			position++;
+			INC8( ref position);
 		}
 	}
 
@@ -543,7 +565,7 @@ public static partial class UnitySAM
 			index = phonemeindex[pos];
 			if ((flags[index]&2) == 0)
 			{
-				pos++;
+				INC8( ref pos);
 				continue;
 			} else
 				if ((flags[index]&1) == 0)
@@ -556,14 +578,22 @@ public static partial class UnitySAM
 
 			do
 			{
-				X++;
+				INC8( ref X);
 				A = phonemeindex[X];
 			} while(A==0);
 
 			if (A != 255)
 			{
-				if ((flags[A] & 8) != 0)  {pos++; continue;}
-				if ((A == 36) || (A == 37)) {pos++; continue;} // '/H' '/X'
+				if ((flags[A] & 8) != 0)
+				{
+					INC8( ref pos);
+					continue;
+				}
+				if ((A == 36) || (A == 37))			 // '/H' '/X'
+				{
+					INC8( ref pos);
+					continue;
+				}
 			}
 
 			Insert(pos+1, index+1, phonemeLengthTable[index+1], stress[pos]);
@@ -621,7 +651,7 @@ public static partial class UnitySAM
 			if (A == 0)
 			{
 				// Move ahead to the
-				pos++;
+				INC8( ref pos);
 				continue;
 			}
 
@@ -682,7 +712,7 @@ public static partial class UnitySAM
 			phonemeindex[X] = 13;  // 'AX'
 			// Perform insert. Note code below may jump up here with different values
 			Insert(X+1, A, mem59, mem58);
-			pos++;
+			INC8( ref pos);
 			// Move to next phoneme
 			continue;
 
@@ -762,7 +792,7 @@ public static partial class UnitySAM
 								if (debug) printf("RULE: Insert glottal stop between two stressed vowels with space between them\n");
 								// 31 = 'Q'
 								Insert(X, 31, mem59, 0);
-								pos++;
+								INC8( ref pos);
 								continue;
 							}
 						}
@@ -818,7 +848,7 @@ public static partial class UnitySAM
 			if (A != 0) phonemeindex[pos] = 18;  // 'RX'
 
 			// continue to next phoneme
-			pos++;
+			INC8( ref pos);
 			continue;
 
 			pos41611:
@@ -831,11 +861,15 @@ public static partial class UnitySAM
 			if (A == 24)    // 'L'
 			{
 				// If prior phoneme does not have VOWEL flag set, move to next phoneme
-				if ((flags[phonemeindex[pos-1]] & 128) == 0) {pos++; continue;}
+				if ((flags[phonemeindex[pos-1]] & 128) == 0)
+				{
+					INC8( ref pos);
+					continue;
+				}
 				// Prior phoneme has VOWEL flag set, so change L to LX and move to next phoneme
 				if (debug) printf("RULE: <VOWEL> L -> <VOWEL> LX\n");
 				phonemeindex[X] = 19;     // 'LX'
-				pos++;
+				INC8( ref pos);
 				continue;
 			}
 
@@ -850,11 +884,15 @@ public static partial class UnitySAM
 			if (A == 32)    // 'S'
 			{
 				// If prior phoneme is not G, move to next phoneme
-				if (phonemeindex[pos-1] != 60) {pos++; continue;}
+				if (phonemeindex[pos-1] != 60)
+				{
+					INC8( ref pos);
+					continue;
+				}
 				// Replace S with Z and move on
 				if (debug) printf("RULE: G S -> G Z\n");
 				phonemeindex[pos] = 38;    // 'Z'
-				pos++;
+				INC8( ref pos);
 				continue;
 			}
 
@@ -894,15 +932,20 @@ public static partial class UnitySAM
 					// At end of buffer?
 					if (index == 255) //prevent buffer overflow
 					{
-						pos++; continue;
+						INC8( ref pos);
+						continue;
 					}
 					else
 						// If diphtong ending with YX, move continue processing next phoneme
-						if ((flags[index] & 32) != 0) {pos++; continue;}
+						if ((flags[index] & 32) != 0)
+						{
+							INC8( ref pos);
+							continue;
+						}
 					// replace G with GX and continue processing next phoneme
 					if (debug) printf("RULE: G <VOWEL OR DIPHTONG NOT ENDING WITH IY> -> GX <VOWEL OR DIPHTONG NOT ENDING WITH IY>\n");
 					phonemeindex[pos] = 63; // 'GX'
-					pos++;
+					INC8( ref pos);
 					continue;
 				}
 
@@ -927,7 +970,7 @@ public static partial class UnitySAM
 			// Replace with softer version
 //			if (debug) printf("RULE: S* %c%c -> S* %c%c\n", signInputTable1[Y], signInputTable2[Y],signInputTable1[Y-12], signInputTable2[Y-12]);
 			phonemeindex[pos] = Y-12;
-			pos++;
+			INC8( ref pos);
 			continue;
 
 
@@ -947,10 +990,14 @@ public static partial class UnitySAM
 				Y = phonemeindex[X-1];
 				A = flags2[Y] & 4;
 				// If not set, continue processing next phoneme
-				if (A == 0) {pos++; continue;}
+				if (A == 0)
+				{
+					INC8( ref pos);
+					continue;
+				}
 				if (debug) printf("RULE: <ALVEOLAR> UW -> <ALVEOLAR> UX\n");
 				phonemeindex[X] = 16;
-				pos++;
+				INC8( ref pos);
 				continue;
 			}
 			pos41779:
@@ -964,7 +1011,7 @@ public static partial class UnitySAM
 				//        pos41783:
 				if (debug) printf("CH -> CH CH+1\n");
 				Insert(X+1, A+1, mem59, stress[X]);
-				pos++;
+				INC8( ref pos);
 				continue;
 			}
 
@@ -979,7 +1026,7 @@ public static partial class UnitySAM
 			{
 				if (debug) printf("J -> J J+1\n");
 				Insert(X+1, A+1, mem59, stress[X]);
-				pos++;
+				INC8( ref pos);
 				continue;
 			}
 
@@ -996,12 +1043,20 @@ public static partial class UnitySAM
 			// Past this point, only process if phoneme is T or D
 
 			if (A != 69)    // 'T'
-			if (A != 57) {pos++; continue;}       // 'D'
+			if (A != 57)       // 'D'
+			{
+				INC8( ref pos);
+				continue;
+			}
 			//pos41825:
 
 
 			// If prior phoneme is not a vowel, continue processing phonemes
-			if ((flags[phonemeindex[X-1]] & 128) == 0) {pos++; continue;}
+			if ((flags[phonemeindex[X-1]] & 128) == 0)
+			{
+				INC8( ref pos);
+				continue;
+			}
 
 			// Get next phoneme
 			INC8( ref X);
@@ -1012,10 +1067,18 @@ public static partial class UnitySAM
 			if (A != 0)
 			{
 				// If next phoneme is not a pause, continue processing phonemes
-				if ((flags[A] & 128) == 0) {pos++; continue;}
+				if ((flags[A] & 128) == 0)
+				{
+					INC8( ref pos);
+					continue;
+				}
 				// If next phoneme is stressed, continue processing phonemes
 				// FIXME: How does a pause get stressed?
-				if (stress[X] != 0) {pos++; continue;}
+				if (stress[X] != 0)
+				{
+					INC8( ref pos);
+					continue;
+				}
 				//pos41856:
 				// Set phonemes to DX
 				if (debug) printf("RULE: Soften T or D following vowel or ER and preceding a pause -> DX\n");
@@ -1024,6 +1087,7 @@ public static partial class UnitySAM
 			{
 				A = phonemeindex[X+1];
 				if (A == 255) //prevent buffer overflow
+					// this seems wrong
 					A = 65 & 128;
 				else
 					// Is next phoneme a vowel or ER?
@@ -1032,7 +1096,7 @@ public static partial class UnitySAM
 				if (A != 0) phonemeindex[pos] = 30;  // 'DX'
 			}
 
-			pos++;
+			INC8( ref pos);
 
 		} // while
 	}
@@ -1184,18 +1248,18 @@ public static partial class UnitySAM
 //							if (debug) printf("phoneme %d (%c%c) length %d\n", loopIndex, signInputTable1[phonemeindex[loopIndex]], signInputTable2[phonemeindex[loopIndex]], phonemeLength[loopIndex]);
 
 							// decrease length of vowel by 1 frame
-							phonemeLength[loopIndex]--;
+							DEC8( ref phonemeLength[loopIndex]);
 
 							if (debug) printf("POST\n");
 //							if (debug) printf("phoneme %d (%c%c) length %d\n", loopIndex, signInputTable1[phonemeindex[loopIndex]], signInputTable2[phonemeindex[loopIndex]], phonemeLength[loopIndex]);
 
 						}
 						// move ahead
-						loopIndex++;
+						INC8( ref loopIndex);
 						continue;
 					}
 					// move ahead
-					loopIndex++;
+					INC8( ref loopIndex);
 					continue;
 				}
 
@@ -1210,9 +1274,10 @@ public static partial class UnitySAM
 					// *, .*, ?*, ,*, -*, DX, S*, SH, F*, TH, /H, /X, CH, P*, T*, K*, KX
 
 					// not an unvoiced plosive?
-					if((mem56 & 1) == 0) {
+					if((mem56 & 1) == 0)
+					{
 						// move ahead
-						loopIndex++;
+						INC8( ref loopIndex);
 						continue;
 					}
 
@@ -1237,7 +1302,7 @@ public static partial class UnitySAM
 //					if (debug) printf("phoneme %d (%c%c) length %d\n", X, signInputTable1[phonemeindex[X]], signInputTable2[phonemeindex[X]], phonemeLength[X]);
 
 					// move ahead
-					loopIndex++;
+					INC8( ref loopIndex);
 					continue;
 				}
 
@@ -1256,7 +1321,7 @@ public static partial class UnitySAM
 //				if (debug) printf("phoneme %d (%c%c) length %d\n", X-1, signInputTable1[phonemeindex[X-1]], signInputTable2[phonemeindex[X-1]], phonemeLength[X-1]);
 
 				// move ahead
-				loopIndex++;
+				INC8( ref loopIndex);
 				continue;
 
 			}
@@ -1310,7 +1375,7 @@ public static partial class UnitySAM
 
 				}
 				// move to next phoneme
-				loopIndex++;
+				INC8( ref loopIndex);
 				continue;
 			}
 
@@ -1338,10 +1403,15 @@ public static partial class UnitySAM
 				if (index == 255) //buffer overflow
 				{
 					// ignore, overflow code
-					if ((65 & 2) == 0) {loopIndex++; continue;}
-				} else if ((flags[index] & 2) == 0) {
+					if ((65 & 2) == 0)
+					{
+						INC8( ref loopIndex);
+						continue;
+					}
+				} else if ((flags[index] & 2) == 0)
+				{
 					// if another stop consonant, move ahead
-					loopIndex++;
+					INC8( ref loopIndex);
 					continue;
 				}
 
@@ -1367,7 +1437,7 @@ public static partial class UnitySAM
 
 
 				// move ahead
-				loopIndex++;
+				INC8( ref loopIndex);
 				continue;
 			}
 
@@ -1402,7 +1472,7 @@ public static partial class UnitySAM
 			}
 
 			// move to next phoneme
-			loopIndex++;
+			INC8( ref loopIndex);
 			continue;
 		}
 		//            goto pos48701;
@@ -1426,7 +1496,10 @@ public static partial class UnitySAM
 			int temp = mem53;
 			mem53 = mem53 << 1;
 			A = A << 1;
-			if (temp >= 128) A++;
+			if (temp >= 128)
+			{
+				INC8( ref A);
+			}
 			if (A >= mem52)
 			{
 				A = A - mem52;

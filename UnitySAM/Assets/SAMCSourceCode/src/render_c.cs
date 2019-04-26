@@ -190,7 +190,12 @@ public static partial class UnitySAM
 
 		// get the next sample from the table
 		// mem47*256 = offset to start of samples
-		A = sampleTable[mem47 * 256 + Y];
+
+		{
+			int offset = mem47 * 256 + Y;
+			// offset %= sampleTable.Length;
+			A = sampleTable[offset];
+		}
 		pos48280:
 
 		// left shift to get the high bit
@@ -219,13 +224,13 @@ public static partial class UnitySAM
 		X = 0;
 
 		// decrement counter
-		mem56--;
+		DEC8( ref mem56);
 
 		// if not done, jump to top of loop
 		if (mem56 != 0) goto pos48280;
 
 		// increment position
-		Y++;
+		INC8( ref Y);
 		if (Y != 0) goto pos48274;
 
 		// restore values and return
@@ -234,13 +239,13 @@ public static partial class UnitySAM
 		return;
 
 
-		int phase1;
+//		int phase1;
 
 		pos48315:
 		// handle voiced samples here
 
 		// number of samples?
-		phase1 = A ^ 255;
+		int phase1 = A ^ 255;
 
 		Y = mem66;
 		do
@@ -406,10 +411,10 @@ public static partial class UnitySAM
 				amplitude3[X] = ampl3data[Y];     // F3 amplitude
 				sampledConsonantFlag[X] = sampledConsonantFlags[Y];        // phoneme data for sampled consonants
 				pitches[X] = pitch + phase1;      // pitch
-				X++;
-				phase2--;
+				INC8( ref X);
+				DEC8( ref phase2);
 			} while (phase2 != 0);
-			mem44++;
+			INC8( ref mem44);
 		} while (mem44 != 0);
 		// -------------------
 		//pos47694:
@@ -553,7 +558,7 @@ public static partial class UnitySAM
 			// get the current and following phoneme
 			Y = phonemeIndexOutput[X];
 			A = phonemeIndexOutput[X + 1];
-			X++;
+			INC8( ref X);
 
 			// exit loop at end token
 			if (A == 255) break;//goto pos47970;
@@ -673,8 +678,8 @@ public static partial class UnitySAM
 						A = Read(mem47, Y) + mem53; //carry alway cleared
 
 						mem48 = A;
-						Y++;
-						X--;
+						INC8( ref Y);
+						DEC8( ref X);
 						if (X == 0) break;
 
 						mem56 += mem51;
@@ -686,20 +691,23 @@ public static partial class UnitySAM
 							{
 								//47935: BIT 50
 								//47937: BMI 47943
-								if (mem48 != 0) mem48++;
+								if (mem48 != 0) INC8( ref mem48);
 							}
-							else mem48--;
+							else
+							{
+								DEC8( ref mem48);
+							}
 						}
 						//pos47945:
 						Write(mem47, Y, mem48);
 					} //while No. 3
 
 					//pos47952:
-					mem47++;
+					INC8( ref mem47);
 					//if (mem47 != 175) goto pos47810;
 				} while (mem47 != 175);     //while No. 2
 			//pos47963:
-			mem44++;
+			INC8( ref mem44);
 			X = mem44;
 		}  //while No. 1
 
@@ -916,7 +924,7 @@ public static partial class UnitySAM
 				}
 
 				for(X = wait2; X>0; X--); //wait
-				mem56--;
+				DEC8( ref mem56);
 			} while(mem56 != 0);
 
 			INC8( ref Y);
@@ -1044,8 +1052,8 @@ public static partial class UnitySAM
 			initialFrequency = throatFormants48_53[Y];
 			newFrequency = trans(throat, initialFrequency);
 			freq2data[pos] = newFrequency;
-			Y++;
-			pos++;
+			INC8( ref Y);
+			INC8( ref pos);
 		}
 	}
 
