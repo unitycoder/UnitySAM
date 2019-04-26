@@ -9,6 +9,8 @@ public class Test1 : MonoBehaviour
 
 	public InputField inputField;
 
+	public Button button;
+
 	void Out( string s)
 	{
 		if (s == null)
@@ -27,7 +29,8 @@ public class Test1 : MonoBehaviour
 
 	void SayString ( string s)
     {
-//		s = s + ".";		// TODO: my C# port seems to crash without final punctuation.
+		// HACK!
+		s = s + ".";		// TODO: my C# port seems to crash without final punctuation.
 
 		Out(null);
 
@@ -72,14 +75,19 @@ public class Test1 : MonoBehaviour
 		AudioSource.PlayClipAtPoint( ac, Camera.main.transform.position);
 	}
 
-	void SayInputField( string s)
+	void GotoMyTwitter()
 	{
-		SayString( s);
+		Application.OpenURL( "https://www.twitter.com/kurtdekker");
 	}
 
 	void Start()
 	{
-		inputField.onEndEdit.AddListener( SayInputField);
+		button.onClick.AddListener( GotoMyTwitter);
+
+		inputField.text = "This Unity three dee see sharp port was by Kurt Deck Her. Come check out my twitter below!";
+		SayString( inputField.text);
+
+		inputField.onEndEdit.AddListener( SayString);
 
 		string s = "HELLO";
 
