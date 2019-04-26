@@ -58,7 +58,7 @@ public class Test1 : MonoBehaviour
 
 		Out("Input:" + s);
 
-		Out("Phonemes:" + output);
+		Out( System.String.Format( "Phonemes ({0}:'{1}'", output.Length, output));
 
 		UnitySAM.SetInput(ints);
 
