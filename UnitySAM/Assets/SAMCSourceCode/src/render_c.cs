@@ -330,8 +330,6 @@ public static partial class UnitySAM
 	//void Code47574()
 	public static void Render()
 	{
-		buf = new Buffer();
-
 		int phase1 = 0;  //mem43
 		int phase2 = 0;
 		int phase3 = 0;

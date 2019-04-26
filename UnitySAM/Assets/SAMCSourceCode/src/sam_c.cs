@@ -166,6 +166,8 @@ public static partial class UnitySAM
 		X = 0;
 		Y = 0;
 
+		buf = new Buffer();
+
 		//pos48551:
 		while(true)
 		{
