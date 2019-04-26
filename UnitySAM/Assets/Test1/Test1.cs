@@ -91,7 +91,7 @@ public class Test1 : MonoBehaviour
 		ButtonKurtTwitter.onClick.AddListener( GotoMyTwitter);
 		ButtonGithub.onClick.AddListener( GotoGithub);
 
-		inputField.text = "This Unity three dee see sharp port was by Kurt Deck Her. Come check out my twitter below!";
+		inputField.text = "This Unity three dee see sharp port was by Kurt Dekker. Come check out my twitter below!";
 		SayString( inputField.text);
 
 		inputField.onEndEdit.AddListener( SayString);
