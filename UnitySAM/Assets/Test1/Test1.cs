@@ -9,7 +9,8 @@ public class Test1 : MonoBehaviour
 
 	public InputField inputField;
 
-	public Button button;
+	public Button ButtonKurtTwitter;
+	public Button ButtonGithub;
 
 	void Out( string s)
 	{
@@ -80,9 +81,15 @@ public class Test1 : MonoBehaviour
 		Application.OpenURL( "https://www.twitter.com/kurtdekker");
 	}
 
+	void GotoGithub()
+	{
+		Application.OpenURL( "https://github.com/kurtdekker/UnitySAM");
+	}
+
 	void Start()
 	{
-		button.onClick.AddListener( GotoMyTwitter);
+		ButtonKurtTwitter.onClick.AddListener( GotoMyTwitter);
+		ButtonGithub.onClick.AddListener( GotoGithub);
 
 		inputField.text = "This Unity three dee see sharp port was by Kurt Deck Her. Come check out my twitter below!";
 		SayString( inputField.text);
