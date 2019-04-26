@@ -7,6 +7,8 @@ public class Test1 : MonoBehaviour
 {
 	public	Text	TextOutput;
 
+	public InputField inputField;
+
 	void Out( string s)
 	{
 		if (s == null)
@@ -23,15 +25,11 @@ public class Test1 : MonoBehaviour
 		TextOutput.text = t;
 	}
 
-	void Start ()
+	void SayString ( string s)
     {
+//		s = s + ".";		// TODO: my C# port seems to crash without final punctuation.
+
 		Out(null);
-
-        string s = "HELLO";
-
-		s = "the imperial arcturan armada is ready for battle.";
-
-		s = "the imperial ark tooran arr mah dah is ready for battle.";
 
 		string output = null;
 
@@ -72,5 +70,23 @@ public class Test1 : MonoBehaviour
 		AudioClip ac = AudioClip.Create( "Hello", buf.GetSize(), 1, 22050, false);
 		ac.SetData( buf.GetFloats(), 0);
 		AudioSource.PlayClipAtPoint( ac, Camera.main.transform.position);
+	}
+
+	void SayInputField( string s)
+	{
+		SayString( s);
+	}
+
+	void Start()
+	{
+		inputField.onEndEdit.AddListener( SayInputField);
+
+		string s = "HELLO";
+
+		s = "the imperial arcturan armada is ready for battle.";
+
+		s = "the imperial ark tooran arr mah dah is ready for battle.";
+
+		//SayString( s);
 	}
 }
