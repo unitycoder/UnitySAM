@@ -8,6 +8,7 @@ public class Test1 : MonoBehaviour
 	public	Text	TextOutput;
 
 	public InputField inputField;
+	public Button ButtonRespeak;
 
 	public Button ButtonKurtTwitter;
 	public Button ButtonGithub;
@@ -90,6 +91,9 @@ public class Test1 : MonoBehaviour
 	{
 		ButtonKurtTwitter.onClick.AddListener( GotoMyTwitter);
 		ButtonGithub.onClick.AddListener( GotoGithub);
+		ButtonRespeak.onClick.AddListener( delegate {
+			SayString(inputField.text);	
+		});
 
 		inputField.text = "This Unity three dee see sharp port was by Kurt Dekker. Come check out my twitter below!";
 		SayString( inputField.text);
