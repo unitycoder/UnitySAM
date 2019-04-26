@@ -68,5 +68,9 @@ public class Test1 : MonoBehaviour
 		{
 			Debug.Log( "Buffer size is " + buf.GetSize());
 		}
+
+		AudioClip ac = AudioClip.Create( "Hello", buf.GetSize(), 1, 22050, false);
+		ac.SetData( buf.GetFloats(), 0);
+		AudioSource.PlayClipAtPoint( ac, Camera.main.transform.position);
 	}
 }

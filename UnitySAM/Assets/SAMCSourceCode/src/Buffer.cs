@@ -29,4 +29,16 @@ public class Buffer
 		}
 		Data[position] = data;
 	}
+
+	public float[] GetFloats()
+	{
+		float[] floats = new float[GetSize()];
+
+		for (int i = 0; i < Data.Count; i++)
+		{
+			floats[i] = (Data[i] - 127) / 255.0f;
+		}
+
+		return floats;
+	}
 }
