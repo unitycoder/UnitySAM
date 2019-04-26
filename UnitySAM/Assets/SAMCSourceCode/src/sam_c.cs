@@ -28,9 +28,9 @@ public static partial class UnitySAM
 	static int[] phonemeLength = new int[256]; //tab40160
 	static int[] phonemeindex = new int[256];
 
-	static int[] phonemeIndexOutput = new int[60]; //tab47296
-	static int[] stressOutput = new int[60]; //tab47365
-	static int[] phonemeLengthOutput = new int[60]; //tab47416
+	static int[] phonemeIndexOutput = new int[256]; //tab47296
+	static int[] stressOutput = new int[256]; //tab47365
+	static int[] phonemeLengthOutput = new int[256]; //tab47416
 
 // contains the final soundbuffer
 	static int bufferpos=0;
