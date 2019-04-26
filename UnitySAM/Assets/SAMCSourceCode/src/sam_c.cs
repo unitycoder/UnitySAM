@@ -290,7 +290,7 @@ public static partial class UnitySAM
 				continue;
 			}
 			// get the next phoneme
-			Y = phonemeindex[pos+1];
+			Y = phonemeindex[(pos+1) & 255];
 			if (Y == 255) //prevent buffer overflow
 			{
 				INC8( ref pos);
@@ -341,9 +341,9 @@ public static partial class UnitySAM
 		int i;
 		for(i=253; i >= position; i--) // ML : always keep last safe-guarding 255
 		{
-			phonemeindex[i+1] = phonemeindex[i];
-			phonemeLength[i+1] = phonemeLength[i];
-			stress[i+1] = stress[i];
+			phonemeindex[(i+1)&255] = phonemeindex[i];
+			phonemeLength[(i+1)&255] = phonemeLength[i];
+			stress[(i+1)&255] = stress[i];
 		}
 
 		phonemeindex[position] = mem60;
@@ -1054,7 +1054,7 @@ public static partial class UnitySAM
 
 
 			// If prior phoneme is not a vowel, continue processing phonemes
-			if ((flags[phonemeindex[X-1]] & 128) == 0)
+			if ((flags[phonemeindex[(X-1)&255]] & 128) == 0)
 			{
 				INC8( ref pos);
 				continue;
@@ -1087,13 +1087,17 @@ public static partial class UnitySAM
 				phonemeindex[pos] = 30;       // 'DX'
 			} else
 			{
-				A = phonemeindex[X+1];
+				A = phonemeindex[(X+1) & 255];
 				if (A == 255) //prevent buffer overflow
-					// this seems wrong
+				{
+					// TODO: this seems wrong, expression is zero
 					A = 65 & 128;
+				}
 				else
+				{
 					// Is next phoneme a vowel or ER?
 					A = flags[A] & 128;
+				}
 				if (debug) if (A != 0) printf("RULE: Soften T or D following vowel or ER and preceding a pause -> DX\n");
 				if (A != 0) phonemeindex[pos] = 30;  // 'DX'
 			}
@@ -1316,8 +1320,8 @@ public static partial class UnitySAM
 //				if (debug) printf("phoneme %d (%c%c) length %d\n", X-1, signInputTable1[phonemeindex[X-1]], signInputTable2[phonemeindex[X-1]],  phonemeLength[X-1]);
 
 				// decrease length
-				A = phonemeLength[X-1];
-				phonemeLength[X-1] = (A >> 2) + A + 1;     // 5/4*A + 1
+				A = phonemeLength[(X-1)&255];
+				phonemeLength[(X-1)&255] = ((A >> 2) + A + 1) & 255;     // 5/4*A + 1
 
 				if (debug) printf("POST\n");
 //				if (debug) printf("phoneme %d (%c%c) length %d\n", X-1, signInputTable1[phonemeindex[X-1]], signInputTable2[phonemeindex[X-1]], phonemeLength[X-1]);
@@ -1369,7 +1373,7 @@ public static partial class UnitySAM
 					phonemeLength[X] = 6;
 
 					// set nasal length to 5
-					phonemeLength[X-1] = 5;
+					phonemeLength[(X-1) & 255] = 5;
 
 //					if (debug) printf("POST\n");
 //					if (debug) printf("phoneme %d (%c%c) length %d\n", X, signInputTable1[phonemeindex[X]], signInputTable2[phonemeindex[X]], phonemeLength[X]);
@@ -1455,7 +1459,7 @@ public static partial class UnitySAM
 				// R*, L*, W*, Y*
 
 				// get the prior phoneme
-				index = phonemeindex[X-1];
+				index = phonemeindex[(X-1)&255];
 
 				// prior phoneme a stop consonant>
 				if((flags[index] & 2) != 0) {
