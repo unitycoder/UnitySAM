@@ -9,6 +9,7 @@ public class Test1 : MonoBehaviour
 
 	public InputField inputField;
 	public Button ButtonRespeak;
+	public Button ButtonSilence;
 
 	public Button ButtonKurtTwitter;
 	public Button ButtonGithub;
@@ -87,12 +88,26 @@ public class Test1 : MonoBehaviour
 		Application.OpenURL( "https://github.com/kurtdekker/UnitySAM");
 	}
 
+	void DestroyAllAudio()
+	{
+		foreach( var az in FindObjectsOfType<AudioSource>())
+		{
+			Destroy(az.gameObject);
+		}
+	}
+
 	void Start()
 	{
 		ButtonKurtTwitter.onClick.AddListener( GotoMyTwitter);
+
 		ButtonGithub.onClick.AddListener( GotoGithub);
+
 		ButtonRespeak.onClick.AddListener( delegate {
 			SayString(inputField.text);	
+		});
+
+		ButtonSilence.onClick.AddListener( delegate {
+			DestroyAllAudio();
 		});
 
 		inputField.text = "This Unity three dee see sharp port was by Kurt Dekker. Come check out my twitter below!";
